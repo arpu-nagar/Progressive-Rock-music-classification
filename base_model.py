@@ -45,55 +45,74 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 # ## Model 
 import torch
 import torch.nn as nn
-# %%
+
 class MyConvNet(nn.Module):
     def __init__(self):
         super(MyConvNet, self).__init__()
 
-        # Define convolutional layers with different kernel sizes and dilations
-        self.conv1 = nn.Conv1d(in_channels=160, out_channels=320, kernel_size=7, stride=1, padding=3)
+        # Define convolutional layers
+        self.conv1 = nn.Conv1d(in_channels=160, out_channels=320, kernel_size=11, stride=1, padding=1)
         self.batchnorm1 = nn.BatchNorm1d(320)
-        self.conv2 = nn.Conv1d(in_channels=320, out_channels=480, kernel_size=5, stride=2, padding=2)
-        self.batchnorm2 = nn.BatchNorm1d(480)
-        self.conv3 = nn.Conv1d(in_channels=480, out_channels=640, kernel_size=3, stride=1, padding=2, dilation=2)
-        self.batchnorm3 = nn.BatchNorm1d(640)
-        self.conv4 = nn.Conv1d(in_channels=640, out_channels=320, kernel_size=3, stride=1, padding=1)
-        self.batchnorm4 = nn.BatchNorm1d(320)
-        self.conv5 = nn.Conv1d(in_channels=320, out_channels=180, kernel_size=1, stride=1, padding=1)
-        self.batchnorm5 = nn.BatchNorm1d(180)
+        self.conv2 = nn.Conv1d(in_channels=320, out_channels=640, kernel_size=9, stride=1, padding=1, dilation=2)
+        self.batchnorm2 = nn.BatchNorm1d(640)
+        self.conv3 = nn.Conv1d(in_channels=640, out_channels=320, kernel_size=7, stride=1, padding=1)
+        self.batchnorm3 = nn.BatchNorm1d(320)
+        self.conv4 = nn.Conv1d(in_channels=320, out_channels=160, kernel_size=5, stride=1, padding=1)
+        self.batchnorm4 = nn.BatchNorm1d(160)
+        # self.conv5 = nn.Conv1d(in_channels=2560, out_channels=5120, kernel_size=3, stride=1, padding=1)
+        # self.batchnorm5 = nn.BatchNorm1d(5120)
 
         # Define fully connected layers
-        self.fc1 = nn.Linear(19800, 200)
-        self.fc2 = nn.Linear(200, 20)
-        self.fc3 = nn.Linear(20, 2)
+        self.fc1 = nn.Linear(30080, 512)  
+        self.fc2 = nn.Linear(512, 256)
+        self.fc3 = nn.Linear(256, 128)
+        self.fc4 = nn.Linear(128, 64)
+        self.fc5 = nn.Linear(64, 2)
 
         # Define activation function
         self.relu = nn.LeakyReLU()
 
-        self.dropout = nn.Dropout(p=0.30)
+        self.dropout = nn.Dropout(p=0.3)
 
     def forward(self, x):
-        # Convolutional layers with ReLU activation
-        x = self.relu(self.batchnorm1(self.conv1(x)))
-        x = self.dropout(x)
-        x = self.relu(self.batchnorm2(self.conv2(x)))
-        x = self.dropout(x)
-        x = self.relu(self.batchnorm3(self.conv3(x)))
-        x = self.dropout(x)
-        x = self.relu(self.batchnorm4(self.conv4(x)))
-        x = self.dropout(x)
-        x = self.relu(self.batchnorm5(self.conv5(x)))
-        x = self.dropout(x)
+        # Convolutional layers with ReLU activation and skip connections
+        x1 = self.relu(self.batchnorm1(self.conv1(x)))
+        x1 = self.dropout(x1)
+        
+        x2 = self.relu(self.batchnorm2(self.conv2(x1)))
+        x2 = self.dropout(x2)
+        
+        x3 = self.relu(self.batchnorm3(self.conv3(x2)))
+        x3 = self.dropout(x3)
+        # x3 = x3 + x1  # Skip connection between conv1 and conv3
+        
+        x4 = self.relu(self.batchnorm4(self.conv4(x3)))
+        x4 = self.dropout(x4)
+        
+        # x5 = self.relu(self.batchnorm5(self.conv5(x4)))
+        # x5 = self.dropout(x5)
+        # x5 = x5 + x3  # Skip connection between conv3 and conv5
+        
+        # x6 = self.relu(self.batchnorm6(self.conv6(x5)))
+        # x6 = self.dropout(x6)
+        
+        # x7 = self.relu(self.batchnorm7(self.conv7(x6)))
+        # x7 = self.dropout(x7)
+        # x7 = x7 + x5  # Skip connection between conv5 and conv7
 
         # Flatten the output of the convolutional layers
-        x = x.view(x.size(0), -1)
+        x = x4.view(x4.size(0), -1)
 
         # Fully connected layers with ReLU activation
         x = self.relu(self.fc1(x))
         x = self.dropout(x)
         x = self.relu(self.fc2(x))
         x = self.dropout(x)
-        x = self.fc3(x)
+        x = self.relu(self.fc3(x))
+        x = self.dropout(x)
+        x = self.relu(self.fc4(x))
+        x = self.dropout(x)
+        x = self.fc5(x)
 
         return x
 
@@ -183,9 +202,9 @@ for e in range(epochs):
 
         i += 1
     loss_hist.append(loss_per_epoch/i)
-    writer.add_scalar("Loss/gates", loss_per_epoch/i, e)
+    writer.add_scalar("Loss/zuck", loss_per_epoch/i, e)
     writer.flush()
-torch.save(model.state_dict(), "./model/bezos/model.pt")
+# torch.save(model.state_dict(), "./model/bezos/model.pt")
 
 
 # %%
@@ -205,7 +224,7 @@ plt.ylabel("Loss")
 # Add a legend
 plt.legend()
 
-# Show the plot
+# # Show the plot
 plt.show()
 
 # %%
