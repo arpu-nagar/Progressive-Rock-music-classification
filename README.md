@@ -3,6 +3,10 @@
 ## Description
 This project aims to classify music tracks into two categories: Progressive Rock and Non Progressive Rock genres. The classification is based on audio features extracted from the tracks.
 
+Report available [here](https://www.arpannagar.tech/Progressive-Rock-music-classification/cap6610sp24_project_final_in_absentia.pdf).
+
+
+
 ## Owners
 - Arpan Nagar
 - Moinak Dey
