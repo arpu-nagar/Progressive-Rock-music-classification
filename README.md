@@ -30,6 +30,10 @@ This project aims to classify music tracks into two categories: Progressive Rock
     ```bash
     python base_model.py
     ```
+4. Models area avaiable in model/ dir. 
+5. For Audio Spectrogram Transformer: refer it's [README](https://github.com/BlackThompson/AST-finetuned-Shenzhen) or refer to original [repo](https://github.com/YuanGongND/ast). 
+
+
 ## Contributing
 Contributions are welcome! If you would like to contribute to this project, please follow these steps:
 1. Fork the repository.
@@ -37,6 +41,7 @@ Contributions are welcome! If you would like to contribute to this project, plea
 3. Make your changes and commit them.
 4. Push your changes to your forked repository.
 5. Submit a pull request to the main repository.
+
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
